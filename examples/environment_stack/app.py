@@ -17,7 +17,15 @@ stack = core.Stack(app, 'EmrLaunchExamplesEnvStack', env=core.Environment(
     account=os.environ['CDK_DEFAULT_ACCOUNT'],
     region=os.environ['CDK_DEFAULT_REGION']))
 
-vpc = ec2.Vpc(stack, 'EmrLaunchVpc')
+vpc = ec2.Vpc(
+        stack, 'EmrLaunchVpc',                    
+        cidr="10.104.197.128/25",                                                                                                     
+       max_azs=1,                                     
+       nat_gateways=1,
+       subnet_configuration=[ec2.SubnetConfiguration(name="public", cidr_mask=26, subnet_type=ec2.SubnetType.PUBLIC),
+                             ec2.SubnetConfiguration(name="private", cidr_mask=26, subnet_type=ec2.SubnetType.PRIVATE)                   
+#                            ec2.SubnetConfiguration(name="private", cidr_mask=26, subnet_type=ec2.SubnetType.ISOLATED)]
+] )
 
 logs_bucket = s3.Bucket(
     stack, 'EmrLaunchLogsBucket',

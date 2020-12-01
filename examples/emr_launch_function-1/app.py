@@ -33,11 +33,11 @@ cluster_config = cluster_configuration.ClusterConfiguration.from_stored_configur
 # is already running. Allow any parameter in the default override_interface to
 # be overwritten.
 launch_function = emr_launch_function.EMRLaunchFunction(
-    stack, 'EMRLaunchFunction111',
-    launch_function_name='launch-basic-cluster111',
+    stack, 'EMRLaunchFunction',
+    launch_function_name='launch-basic-cluster22',
     cluster_configuration=cluster_config,
     emr_profile=sse_kms_profile,
-    cluster_name='basic-cluster111',
+    cluster_name='basic-cluster22',
     default_fail_if_cluster_running=True,
     cluster_tags=[core.Tag('Key1', 'Value1'), core.Tag('Key2', 'Value2')],
     wait_for_cluster_start=True)

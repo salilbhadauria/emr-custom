@@ -1,0 +1,11 @@
+-e .
+aws-cdk.aws_ec2
+aws-cdk.aws_s3_deployment
+aws-cdk.aws_lambda
+aws-cdk.aws_stepfunctions
+aws-cdk.aws_stepfunctions_tasks
+aws-cdk.aws_secretsmanager
+boto3
+aws-cdk.aws_emr
+aws-cdk.aws_sns
+

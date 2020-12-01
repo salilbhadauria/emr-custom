@@ -1,0 +1,9 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Resources:
+  StagingBucket:
+    Type: AWS::S3::Bucket
+Outputs:
+  BucketName:
+    Value: !Ref StagingBucket
+  BucketDomainName:
+    Value: !GetAtt StagingBucket.RegionalDomainName

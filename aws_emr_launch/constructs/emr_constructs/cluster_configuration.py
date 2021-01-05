@@ -178,7 +178,7 @@ class ClusterConfiguration(BaseConstruct):
 
     @staticmethod
     def _get_applications(applications: Optional[List[str]]) -> List[dict]:
-        return [{'Name': app} for app in (applications if applications else ['Hadoop', 'Hive', 'Spark'])]
+        return [{'Name': app} for app in (applications if applications else ['Hadoop', 'Hive', 'Spark', 'Hue'])]
 
     @staticmethod
     def _get_configurations(configurations: Optional[List[dict]], use_glue_catalog: bool) -> List[dict]:

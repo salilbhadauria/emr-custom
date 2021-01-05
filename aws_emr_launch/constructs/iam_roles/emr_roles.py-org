@@ -98,7 +98,7 @@ class EMRRoles(BaseConstruct):
         role = iam.Role(
             scope, id, role_name=role_name,
             assumed_by=iam.ServicePrincipal('elasticmapreduce.amazonaws.com'),
-            inline_policies={
+service-role/AmazonElasticMapReduceRole            inline_policies={
                 'emr-artifacts-policy': EMRRoles._emr_artifacts_policy()
             },
             managed_policies=[

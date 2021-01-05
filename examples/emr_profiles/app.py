@@ -38,7 +38,7 @@ kerberos_attributes_secret = secretsmanager.Secret.from_secret_arn(
 # By default S3 Server Side encryption is enabled
 sse_s3_profile = emr_profile.EMRProfile(
     stack, 'SSES3Profile',
-    profile_name='gama-sse-s3-profile',
+    profile_name='sse-s3-profile',
     vpc=vpc,
     logs_bucket=logs_bucket,
     artifacts_bucket=artifacts_bucket
@@ -55,7 +55,7 @@ kms_key = kms.Key(stack, 'AtRestKMSKey')
 # And a new profile to use the KMS Key
 sse_kms_profile = emr_profile.EMRProfile(
     stack, 'SSEKMSProfile',
-    profile_name='gama-sse-kms-profile',
+    profile_name='sse-kms-profile',
     vpc=vpc,
     logs_bucket=logs_bucket,
     artifacts_bucket=artifacts_bucket

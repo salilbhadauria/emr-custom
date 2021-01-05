@@ -19,19 +19,17 @@ class EMRRoles(BaseConstruct):
 
         if role_name_prefix:
             self._service_role = EMRRoles._create_service_role(
-               # self, 'EMRServiceRole', role_name='EMR_EC2_DefaultRole_Limited')
-                self, 'EMRServiceRole', role_name='EMR_Default_Role_Limited')
+                self, 'EMRServiceRole', role_name='{}-ServiceRole'.format(role_name_prefix))
             self._instance_role = EMRRoles._create_instance_role(
-               # self, 'EMRInstanceRole', role_name='{}-InstanceRole'.format(role_name_prefix))
-                self, 'EMRInstanceRole', role_name='EMR_EC2_DefaultRole_Limited')
+                self, 'EMRInstanceRole', role_name='{}-InstanceRole'.format(role_name_prefix))
             self._autoscaling_role = EMRRoles._create_autoscaling_role(
                 self, 'EMRAutoScalingRole', role_name='{}-AutoScalingRole'.format(role_name_prefix))
 
-            #self._instance_profile = iam.CfnInstanceProfile(
-             #   self, '{}_InstanceProfile'.format(id),
-            #    roles=[self._instance_role.role_name],
-            #    instance_profile_name=self._instance_role.role_name)
-           # self._instance_profile_arn = self._instance_profile.attr_arn
+            self._instance_profile = iam.CfnInstanceProfile(
+                self, '{}_InstanceProfile'.format(id),
+                roles=[self._instance_role.role_name],
+                instance_profile_name=self._instance_role.role_name)
+            self._instance_profile_arn = self._instance_profile.attr_arn
 
         if artifacts_bucket:
             artifacts_bucket.grant_read(
@@ -177,33 +175,19 @@ class EMRRoles(BaseConstruct):
 
     @staticmethod
     def _create_service_role(scope: core.Construct, id: str, *, role_name: Optional[str] = None):
-        # role = 'EMR_Default_Role_Limited'
-        #role = iam.Role.from_role_arn(self, "Role", "arn:aws:iam::541367137343:role/EMR_Default_Role_Limited"
-        roles = EMRRoles(scope, id)
-        role = iam.Role.from_role_arn(roles, "Role", "arn:aws:iam::541367137343:role/EMR_Default_Role_Limited",
-
-        # Set 'mutable' to 'false' to use the role as-is and prevent adding new
-
-        # policies to it. The default is 'true', which means the role may be
-
-        # modified as part of the deployment.
-
-        mutable=False
-
-        )
-        # iam.Role(
-        # scope, id, role_name=role_name,
-        # assumed_by=iam.ServicePrincipal('elasticmapreduce.amazonaws.com'),
-        # inline_policies={
-        #     'emr-artifacts-policy': EMRRoles._emr_artifacts_policy(),
-        # 'EMRrr-Limited-Role' :   EMRRoles._EMRrr_Limited_Role(),
-        # },
-        #   managed_policies=[
-        #       iam.ManagedPolicy.from_aws_managed_policy_name('service-role/AmazonElasticMapReduceRole')
-        #   ]
-
-        # )
+        role = iam.Role(
+            scope, id, role_name=role_name,
+            assumed_by=iam.ServicePrincipal('elasticmapreduce.amazonaws.com'),
+            inline_policies={
+                'emr-artifacts-policy': EMRRoles._emr_artifacts_policy(),
+ 		'EMRrr-Limited-Role' :   EMRRoles._EMRrr_Limited_Role(),
+            },
+       #     managed_policies=[
+       #         iam.ManagedPolicy.from_aws_managed_policy_name('EMR_Limited_Role')
+       #     ]
+            )
         return role
+
     @staticmethod
     def _create_autoscaling_role(scope: core.Construct, id: str, *, role_name: Optional[str] = None):
         role = iam.Role(
@@ -229,32 +213,16 @@ class EMRRoles(BaseConstruct):
 
     @staticmethod
     def _create_instance_role(scope: core.Construct, id: str, *, role_name: Optional[str] = None):
-         # role = 'EMR_Default_Role_Limited'
-        #role = iam.Role.from_role_arn(self, "Role", "arn:aws:iam::541367137343:role/EMR_Default_Role_Limited"
-        roles = EMRRoles(scope, id)
-        role = iam.Role.from_role_arn(roles, "Role", "arn:aws:iam::541367137343:role/EMR_EC2_DefaultRole_Limited",
-
-        # Set 'mutable' to 'false' to use the role as-is and prevent adding new
-
-        # policies to it. The default is 'true', which means the role may be
-
-        # modified as part of the deployment.
-
-        mutable=False
-
-        )
-        # iam.Role(
-        # scope, id, role_name=role_name,
-        # assumed_by=iam.ServicePrincipal('elasticmapreduce.amazonaws.com'),
-        # inline_policies={
-        #     'emr-artifacts-policy': EMRRoles._emr_artifacts_policy(),
-        # 'EMRrr-Limited-Role' :   EMRRoles._EMRrr_Limited_Role(),
-        # },
-        #   managed_policies=[
-        #       iam.ManagedPolicy.from_aws_managed_policy_name('service-role/AmazonElasticMapReduceRole')
-        #   ]
-
-        # )
+        role = iam.Role(
+            scope, id,
+            role_name=role_name,
+            assumed_by=iam.ServicePrincipal('ec2.amazonaws.com'),
+            inline_policies={
+                'emr-artifacts-policy': EMRRoles._emr_artifacts_policy(),
+                'glue-catalog-policy': EMRRoles._glue_catalog_policy(scope)
+            },
+       #     managed_policies=[iam.ManagedPolicy.from_aws_managed_policy_name('EC2_for_EMR') ]
+       )   
         return role
 
     @staticmethod
@@ -265,7 +233,7 @@ class EMRRoles(BaseConstruct):
         roles._instance_role = iam.Role.from_role_arn(roles, 'EMRInstanceRole', instance_role_arn, mutable=mutable)
         roles._autoscaling_role = iam.Role.from_role_arn(
             roles, 'EMRAutoScalingRole', autoscaling_role_arn, mutable=False)
-    #    roles._instance_profile_arn = roles._instance_role.role_arn.replace(':role/', ':instance-profile/')
+        roles._instance_profile_arn = roles._instance_role.role_arn.replace(':role/', ':instance-profile/')
         return roles
 
     @property
@@ -280,6 +248,6 @@ class EMRRoles(BaseConstruct):
     def autoscaling_role(self) -> iam.Role:
         return self._autoscaling_role
 
-   # @property
-   # def instance_profile_arn(self) -> str:
-   #     return self._instance_profile_arn
+    @property
+    def instance_profile_arn(self) -> str:
+        return self._instance_profile_arn
